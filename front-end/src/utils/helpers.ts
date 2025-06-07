@@ -36,13 +36,25 @@ export function filterPlayers(players: Player[], filters: FilterOptions): Player
   });
 }
 
-export function sortPlayers(players: Player[]): Player[] {
+export function sortPlayers(players: Player[], filters?: FilterOptions): Player[] {
   return [...players].sort((a, b) => {
-    // Drafted players go to bottom
-    if (a.isDrafted && !b.isDrafted) return 1;
-    if (!a.isDrafted && b.isDrafted) return -1;
+    // When showing drafted players specifically, prioritize them
+    if (filters?.showDrafted) {
+      // Both drafted - sort by draft position
+      if (a.isDrafted && b.isDrafted) {
+        return (a.draftPosition || 0) - (b.draftPosition || 0);
+      }
+      // This shouldn't happen since we're filtering for drafted only
+      return a.isDrafted ? -1 : 1;
+    }
     
-    // Sort by overall rank
+    // When showing available only, normal rank sorting
+    if (filters?.onlyAvailable) {
+      return a.overallRank - b.overallRank;
+    }
+    
+    // When showing all players (default), sort by overall rank regardless of draft status
+    // This allows drafted players to remain visible in their ranked position
     return a.overallRank - b.overallRank;
   });
 }

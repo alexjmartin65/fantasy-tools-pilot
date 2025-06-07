@@ -28,9 +28,8 @@ export function PlayerList() {
       </div>
     );
   }
-
   const filteredPlayers = filterPlayers(session.players, filters);
-  const sortedPlayers = sortPlayers(filteredPlayers);
+  const sortedPlayers = sortPlayers(filteredPlayers, filters);
   const currentTeamId = getCurrentPickTeam(session);
 
   const handleDraftPlayer = (player: Player) => {
@@ -72,17 +71,19 @@ export function PlayerList() {
             {filteredPlayers.length} players shown
           </div>
         </div>
-      </div>
-
-      {/* Players Table */}
-      <div className="flex-1 overflow-auto">
+      </div>      {/* Players Table */}
+      <div className="flex-1 overflow-y-auto overflow-x-auto shadow-inner" style={{
+        maxHeight: 'calc(100vh - 240px)',
+        minHeight: '400px',
+        scrollBehavior: 'smooth'
+      }}>
         {sortedPlayers.length === 0 ? (
           <div className="flex items-center justify-center h-64">
             <p className="text-gray-500">No players found matching your filters.</p>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0">
+          <table className="min-w-full divide-y divide-gray-200 relative">
+            <thead className="bg-gray-50 sticky top-0 z-20 shadow-sm border-b-2 border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Rank
@@ -103,17 +104,17 @@ export function PlayerList() {
                   Action
                 </th>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">              {sortedPlayers.map((player) => (
+            </thead>            <tbody className="bg-white divide-y divide-gray-200 relative">
+              {sortedPlayers.map((player, index) => (
                 <tr
                   key={player.id}
-                  className={`hover:bg-gray-50 ${
+                  className={`hover:bg-gray-50 transition-colors duration-150 ${
                     player.isDrafted 
                       ? filters.showDrafted 
                         ? 'bg-orange-50 border-l-4 border-orange-400' 
                         : 'opacity-50'
                       : ''
-                  }`}
+                  } ${index % 2 === 0 ? 'bg-gray-25' : 'bg-white'}`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     #{player.overallRank}
@@ -158,10 +159,13 @@ export function PlayerList() {
                       </button>
                     )}
                   </td>
-                </tr>
-              ))}
+                </tr>              ))}
             </tbody>
           </table>
+        )}
+        {/* Scroll indicator - shows when there's more content below */}
+        {sortedPlayers.length > 10 && (
+          <div className="sticky bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gray-100 to-transparent pointer-events-none opacity-60"></div>
         )}
       </div>
     </div>
