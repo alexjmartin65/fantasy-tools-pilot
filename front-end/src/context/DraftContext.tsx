@@ -20,7 +20,7 @@ const initialState: DraftState = {
   filters: {
     position: 'ALL',
     searchTerm: '',
-    onlyAvailable: true,
+    onlyAvailable: false,
     showDrafted: false,
   },
   isLoading: false,
